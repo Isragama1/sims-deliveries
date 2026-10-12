@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { DataService } from '../../core/data.service';
 import { Activacion } from '../../core/models';
 import { CommonModule } from '@angular/common';
@@ -24,6 +25,13 @@ export class ActivacionForm {
   error = '';
   iccid = '';
 
+  // Signal reactivo del ICCID de la ruta
+  private readonly iccidSignal = computed(() => this.route.snapshot.paramMap.get('iccid') ?? '');
+  // Datos cacheados
+  private readonly activaciones = toSignal(this.data.activaciones$(), { initialValue: [] as Activacion[] });
+  // Busca la activación en los datos cacheados
+  readonly act = computed(() => this.activaciones().find(a => a.iccid === this.iccidSignal()));
+
   constructor() {
     this.form = this.fb.group({
       sub: [''],
@@ -46,36 +54,18 @@ export class ActivacionForm {
       planTarifario: [''],
     });
 
-    this.route.paramMap.subscribe((params) => {
-      this.iccid = params.get('iccid') ?? '';
-      if (this.iccid) this.cargar();
+    // Efecto para cargar cuando cambie el ICCID
+    effect(() => {
+      const act = this.act();
+      if (act) {
+        this.patchForm(act);
+        this.cargando = false;
+      } else if (this.iccidSignal()) {
+        this.cargando = true;
+      } else {
+        this.cargando = false;
+      }
     });
-  }
-
-  async cargar(): Promise<void> {
-    this.cargando = true;
-    this.error = '';
-    try {
-      const snap = await this.data.activaciones$().subscribe({
-        next: (lista) => {
-          const act = lista.find((a) => a.iccid === this.iccid);
-          if (act) {
-            this.patchForm(act);
-          } else {
-            this.error = 'Activación no encontrada';
-          }
-          this.cargando = false;
-        },
-        error: () => {
-          this.error = 'Error al cargar';
-          this.cargando = false;
-        },
-      });
-      snap.unsubscribe();
-    } catch {
-      this.error = 'Error al cargar';
-      this.cargando = false;
-    }
   }
 
   private patchForm(a: Activacion): void {
@@ -103,7 +93,7 @@ export class ActivacionForm {
   }
 
   async guardar(): Promise<void> {
-    if (this.form.invalid || !this.iccid) return;
+    if (this.form.invalid || !this.iccidSignal()) return;
     this.guardando = true;
     this.error = '';
 
@@ -134,7 +124,7 @@ export class ActivacionForm {
     };
 
     try {
-      await this.data.actualizarActivacion(this.iccid, datos);
+      await this.data.actualizarActivacion(this.iccidSignal(), datos);
       await this.router.navigate(['/stock']);
     } catch {
       this.error = 'Error al guardar';

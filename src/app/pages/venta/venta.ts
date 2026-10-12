@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -19,9 +19,11 @@ export class VentaPage {
   private auth = inject(AuthService);
   private geo = inject(GeoService);
 
+  // Carga lazy: activaciones y clientes al iniciar
   readonly sims = toSignal(this.data.activaciones$(), { initialValue: [] as Activacion[] });
   readonly clientes = toSignal(this.data.clientes$(), { initialValue: [] as Cliente[] });
   readonly ventas = toSignal(this.data.ventas$(), { initialValue: [] as Venta[] });
+
   private usuario = toSignal(this.auth.user$);
 
   // formulario

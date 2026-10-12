@@ -1,9 +1,7 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { switchMap } from 'rxjs';
 import { DataService } from '../../core/data.service';
 import { Activacion, Entrega } from '../../core/models';
 
@@ -19,17 +17,19 @@ export class ClienteDetalle {
   /** Viene de la ruta /clientes/:id (withComponentInputBinding). */
   readonly id = input.required<string>();
 
-  readonly cliente = toSignal(
-    toObservable(this.id).pipe(switchMap((id) => this.data.cliente$(id))),
+  // Datos base cacheados
+  private readonly clientesBase = toSignal(this.data.clientes$(), { initialValue: [] as any[] });
+  private readonly activacionesBase = toSignal(this.data.activaciones$(), { initialValue: [] as Activacion[] });
+  private readonly entregasBase = toSignal(this.data.entregas$(), { initialValue: [] as Entrega[] });
+
+  // Public computed signals for template
+  readonly cliente = computed(() => this.clientesBase().find(c => c.id === this.id()) ?? null);
+
+  readonly sims = computed(() =>
+    this.activacionesBase().filter(a => a.clienteId === this.id())
   );
 
-  readonly sims = toSignal(
-    toObservable(this.id).pipe(switchMap((id) => this.data.activacionesPorCliente$(id))),
-    { initialValue: [] as Activacion[] },
-  );
-
-  readonly entregas = toSignal(
-    toObservable(this.id).pipe(switchMap((id) => this.data.entregasPorCliente$(id))),
-    { initialValue: [] as Entrega[] },
+  readonly entregas = computed(() =>
+    this.entregasBase().filter(e => e.clienteId === this.id())
   );
 }

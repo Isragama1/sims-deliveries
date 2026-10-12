@@ -2,9 +2,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { combineLatest, map } from 'rxjs';
 import { DataService } from '../../core/data.service';
-import { Cliente } from '../../core/models';
+import { Cliente, Activacion } from '../../core/models';
 
 interface ClienteConStats extends Cliente {
   sims: number;
@@ -22,20 +21,27 @@ export class Clientes {
 
   readonly busqueda = signal('');
 
-  private clientesConStats$ = combineLatest([
-    this.data.clientes$(),
-    this.data.activaciones$(),
-  ]).pipe(
-    map(([clientes, acts]) =>
-      clientes.map((c) => ({
-        ...c,
-        sims: acts.filter((a) => a.clienteId === c.id).length,
-        activadas: acts.filter((a) => a.clienteId === c.id && a.estatus === 'activado').length,
-      })),
-    ),
-  );
+  // Usa datos cacheados del servicio (client-side join, zero extra reads)
+  private readonly clientesBase = toSignal(this.data.clientes$(), { initialValue: [] as Cliente[] });
+  private readonly activaciones = toSignal(this.data.activaciones$(), { initialValue: [] as Activacion[] });
 
-  readonly clientes = toSignal(this.clientesConStats$, { initialValue: [] as ClienteConStats[] });
+  readonly clientes = computed<ClienteConStats[]>(() => {
+    const clientes = this.clientesBase();
+    const acts = this.activaciones();
+    const mapa = new Map<string, { sims: number; activadas: number }>();
+    for (const a of acts) {
+      if (!a.clienteId) continue;
+      const m = mapa.get(a.clienteId) ?? { sims: 0, activadas: 0 };
+      m.sims++;
+      if (a.estatus === 'activado') m.activadas++;
+      mapa.set(a.clienteId, m);
+    }
+    return clientes.map(c => ({
+      ...c,
+      sims: mapa.get(c.id)?.sims ?? 0,
+      activadas: mapa.get(c.id)?.activadas ?? 0,
+    }));
+  });
 
   readonly filtrados = computed(() => {
     const q = this.busqueda().trim().toLowerCase();
