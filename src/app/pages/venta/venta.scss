@@ -1,0 +1,295 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f4f6f8;
+  padding-bottom: 2rem;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: #2c5364;
+  color: #fff;
+
+  .back {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+.card {
+  background: #fff;
+  margin: 1rem 1.25rem;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    color: #15303f;
+  }
+}
+
+.form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #37474f;
+  position: relative;
+}
+
+input,
+select {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #cfd8dc;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fff;
+
+  &:focus { border-color: #2c5364; }
+}
+
+.sim-box {
+  display: flex;
+  gap: 0.4rem;
+
+  input { flex: 1; }
+
+  .limpiar {
+    border: 0;
+    background: #eceff1;
+    border-radius: 10px;
+    padding: 0 0.8rem;
+    cursor: pointer;
+  }
+}
+
+.sugerencias {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  border: 1px solid #cfd8dc;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.8rem;
+    cursor: pointer;
+    font-weight: 400;
+
+    &:hover { background: #f4f6f8; }
+
+    .dn { font-weight: 700; color: #15303f; }
+
+    .icc {
+      font-family: ui-monospace, monospace;
+      font-size: 0.7rem;
+      color: #90a4ae;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.marca {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #00a8e0; // ATT
+  flex-shrink: 0;
+
+  &.unefon { color: #e65100; }
+  &.telcel { color: #1a237e; }
+  &.movistar { color: #00796b; }
+}
+
+.badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #e3f2fd;
+  color: #1565c0;
+
+  &.b-act {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+}
+
+.seleccionadas {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #eef4f7;
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+
+    .dn { font-weight: 700; color: #15303f; font-size: 0.85rem; }
+
+    .icc {
+      font-family: ui-monospace, monospace;
+      font-size: 0.68rem;
+      color: #6b7a85;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .quitar {
+      border: 0;
+      background: transparent;
+      color: #c62828;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 0 0.3rem;
+    }
+  }
+}
+
+.contador-sims {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.fila-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.check {
+  grid-template-columns: auto 1fr;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 400;
+
+  input { width: auto; }
+}
+
+.msg {
+  margin: 0;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+
+  &.ok { background: #e8f5e9; color: #2e7d32; }
+  &.error { background: #fdecea; color: #c62828; }
+}
+
+.guardar {
+  padding: 0.8rem;
+  border: 0;
+  border-radius: 10px;
+  background: #2c5364;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.historial {
+  padding: 0 1.25rem;
+
+  h2 {
+    font-size: 0.95rem;
+    color: #37474f;
+    margin: 0.75rem 0 0.5rem;
+  }
+}
+
+.venta {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.6rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  .fila1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .concepto {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1565c0;
+
+    &.act { color: #2e7d32; }
+  }
+
+  .monto {
+    font-weight: 700;
+    color: #15303f;
+  }
+
+  .icc-lista {
+    margin: 0.2rem 0;
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .icc {
+    font-family: ui-monospace, monospace;
+    font-size: 0.72rem;
+    color: #90a4ae;
+  }
+
+  .fila2 {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+
+    .num-sims { color: #1565c0; font-weight: 600; }
+    .cliente { color: #37474f; font-weight: 600; }
+    .ubicacion { color: #2e7d32; text-decoration: none; font-weight: 600; }
+    .fecha { color: #6b7a85; margin-left: auto; }
+  }
+
+  .notas {
+    font-size: 0.75rem;
+    color: #6b7a85;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+}
+
+.vacio {
+  text-align: center;
+  color: #6b7a85;
+  padding: 1.5rem 0;
+}

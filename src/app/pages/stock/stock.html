@@ -1,0 +1,73 @@
+<header class="topbar">
+  <a routerLink="/home" class="back">←</a>
+  <h1>Stock de SIMs</h1>
+</header>
+
+<section class="resumen">
+  <div class="tarjeta" [class.selected]="filtroEstatus() === 'todos'" (click)="filtroEstatus.set('todos')">
+    <span class="num">{{ totales().total }}</span>
+    <span class="lbl">Total</span>
+  </div>
+  <div class="tarjeta stock" [class.selected]="filtroEstatus() === 'en_stock'" (click)="filtroEstatus.set('en_stock')">
+    <span class="num">{{ totales().enStock }}</span>
+    <span class="lbl">En stock</span>
+  </div>
+  <div class="tarjeta activa" [class.selected]="filtroEstatus() === 'activado'" (click)="filtroEstatus.set('activado')">
+    <span class="num">{{ totales().activadas }}</span>
+    <span class="lbl">Activadas</span>
+  </div>
+</section>
+
+<section class="marcas">
+  @for (m of porMarca(); track m[0]) {
+    <button
+      class="chip"
+      [class.selected]="filtroMarca() === m[0]"
+      (click)="filtroMarca.set(filtroMarca() === m[0] ? 'todas' : $any(m[0]))"
+    >
+      {{ m[0] }} <strong>{{ m[1] }}</strong>
+    </button>
+  }
+</section>
+
+<section class="filtros">
+  <input
+    type="search"
+    placeholder="Buscar por ICCID, número o cliente…"
+    [ngModel]="busqueda()"
+    (ngModelChange)="busqueda.set($event)"
+  />
+  <select [ngModel]="filtroMarca()" (ngModelChange)="filtroMarca.set($event)">
+    <option value="todas">Todas las marcas</option>
+    <option value="ATT">ATT</option>
+    <option value="UNEFON">UNEFON</option>
+    <option value="TELCEL">TELCEL</option>
+    <option value="MOVISTAR">MOVISTAR</option>
+  </select>
+</section>
+
+<section class="lista">
+  @for (a of filtradas(); track a.iccid) {
+    <article class="sim" [class.activada]="a.estatus === 'activado'">
+      <div class="fila1">
+        <span class="dn">{{ a.lada }} {{ a.dn }}</span>
+        <span class="badge" [class.b-act]="a.estatus === 'activado'">
+          {{ a.estatus === 'activado' ? 'Activada' : 'En stock' }}
+        </span>
+      </div>
+      <div class="iccid">{{ a.iccid }}</div>
+      <div class="fila2">
+        <span class="marca" [class.unefon]="a.marca === 'UNEFON'" [class.telcel]="a.marca === 'TELCEL'" [class.movistar]="a.marca === 'MOVISTAR'">{{ a.marca }}</span>
+        @if (a.clienteNombre && a.clienteNombre !== '#N/A') {
+          <span class="cliente">{{ a.clienteNombre }}</span>
+        }
+        @if (a.fechaVencimiento) {
+          <span class="vence">Vence: {{ a.fechaVencimiento.toDate() | date: 'dd/MM/yyyy' }}</span>
+        }
+      </div>
+      <a class="btn-editar" [routerLink]="['/activaciones', a.iccid, 'editar']">Editar</a>
+    </article>
+  } @empty {
+    <p class="vacio">No hay SIMs que coincidan con el filtro.</p>
+  }
+</section>

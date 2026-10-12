@@ -1,0 +1,122 @@
+<header class="topbar">
+  <button class="btn-volver" (click)="volver()">←</button>
+  <h1>Editar activación</h1>
+</header>
+
+<main class="content">
+  @if (cargando) {
+    <p class="cargando">Cargando…</p>
+  } @else if (error) {
+    <p class="error">{{ error }}</p>
+    <button class="btn-reintentar" (click)="cargar()">Reintentar</button>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="formulario">
+      <section class="seccion">
+        <h2>Datos SIM</h2>
+        <div class="campo">
+          <label>ICCID</label>
+          <input type="text" [value]="iccid" readonly />
+        </div>
+        <div class="campo">
+          <label>Marca</label>
+          <select formControlName="marca">
+            <option value="ATT">ATT</option>
+            <option value="UNEFON">UNEFON</option>
+            <option value="TELCEL">TELCEL</option>
+            <option value="MOVISTAR">MOVISTAR</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label>SUB</label>
+          <input type="text" formControlName="sub" placeholder="SUB" />
+        </div>
+        <div class="campo">
+          <label>LADA</label>
+          <input type="text" formControlName="lada" placeholder="LADA" />
+        </div>
+        <div class="campo">
+          <label>DN</label>
+          <input type="text" formControlName="dn" placeholder="DN" />
+        </div>
+        <div class="campo">
+          <label>Recarga ($)</label>
+          <input type="number" formControlName="recargaMonto" placeholder="0" min="0" step="1" />
+        </div>
+        <div class="campo">
+          <label>Tipo</label>
+          <input type="text" formControlName="tipo" placeholder="Tipo" />
+        </div>
+      </section>
+
+      <section class="seccion">
+        <h2>Cliente</h2>
+        <div class="campo">
+          <label>Nombre</label>
+          <input type="text" formControlName="clienteNombre" placeholder="Nombre del cliente" />
+        </div>
+        <div class="campo">
+          <label>ID Cliente</label>
+          <input type="text" formControlName="clienteId" placeholder="ID del cliente" />
+        </div>
+        <div class="campo">
+          <label>Estatus</label>
+          <select formControlName="estatus">
+            <option value="en_stock">En stock</option>
+            <option value="activado">Activado</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="seccion">
+        <h2>Activación (orden)</h2>
+        <div class="campo">
+          <label>ID Orden</label>
+          <input type="text" formControlName="idOrden" placeholder="ID Orden" />
+        </div>
+        <div class="campo">
+          <label>Nº Contrato</label>
+          <input type="text" formControlName="noContrato" placeholder="Nº Contrato" />
+        </div>
+        <div class="campo">
+          <label>Status Orden</label>
+          <input type="text" formControlName="statusOrden" placeholder="Status" />
+        </div>
+        <div class="campo">
+          <label>Cuenta Cliente</label>
+          <input type="text" formControlName="cuentaCliente" placeholder="Cuenta" />
+        </div>
+        <div class="campo">
+          <label>MDN Inicial</label>
+          <input type="text" formControlName="mdnInicial" placeholder="MDN Inicial" />
+        </div>
+        <div class="campo">
+          <label>MDN Actual</label>
+          <input type="text" formControlName="mdnActual" placeholder="MDN Actual" />
+        </div>
+        <div class="campo">
+          <label>MDN Definitivo</label>
+          <input type="text" formControlName="mdnDefinitivo" placeholder="MDN Definitivo" />
+        </div>
+        <div class="campo">
+          <label>Empresa</label>
+          <input type="text" formControlName="empresa" placeholder="Empresa" />
+        </div>
+        <div class="campo">
+          <label>Plan Tarifario</label>
+          <input type="text" formControlName="planTarifario" placeholder="Plan" />
+        </div>
+      </section>
+
+      @if (error) {
+        <p class="error">{{ error }}</p>
+      }
+
+      <div class="acciones">
+        <button type="button" class="btn-secundario" (click)="volver()">Cancelar</button>
+        <button type="submit" class="btn-primario" [disabled]="guardando || form.invalid">
+          {{ guardando ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  }
+</main>

@@ -1,0 +1,129 @@
+<header class="topbar">
+  <a routerLink="/home" class="back">←</a>
+  <h1>Estadísticas</h1>
+</header>
+
+<main class="content">
+  <nav class="tabs" role="tablist">
+    <button role="tab" [class.active]="tab() === 'activaciones'" (click)="tab.set('activaciones')" [attr.aria-selected]="tab() === 'activaciones'">📊 Activaciones</button>
+    <button role="tab" [class.active]="tab() === 'entregas'" (click)="tab.set('entregas')" [attr.aria-selected]="tab() === 'entregas'">📦 Entregas</button>
+  </nav>
+
+  @if (tab() === 'activaciones') {
+    <section class="tarjetas">
+      @for (t of tarjetasAct(); track t.label) {
+        <article class="tarjeta" [style.border-left-color]="t.color">
+          <span class="lbl">{{ t.label }}</span>
+          <span class="val">{{ t.value }}</span>
+        </article>
+      }
+    </section>
+
+    <section class="grafica">
+      <h2>Últimos 3 meses</h2>
+      <div class="meses-resumen">
+        @for (m of ultimos3MesesAct(); track m.mes) {
+          <button class="mes-card" [class.expandido]="mesDetalle() === m.mes" (click)="verDetalleMes(m.mes)">
+            <div class="mes-header">
+              <span class="mes-nombre">{{ formatoMes(m.mes) }}</span>
+              <span class="mes-total">{{ m.total }}</span>
+            </div>
+            <div class="marcas-resumen">
+              @for (marca of ['ATT','UNEFON','TELCEL','MOVISTAR']; track marca) {
+                <span class="marca-chip" [class.unefon]="marca==='UNEFON'" [class.telcel]="marca==='TELCEL'" [class.movistar]="marca==='MOVISTAR'">
+                  {{ marca }}: {{ m.marcas.get(marca) ?? 0 }}
+                </span>
+              }
+            </div>
+            @if (mesDetalle() === m.mes && m.total > 0) {
+              <div class="mes-detalle">
+                <table>
+                  <thead>
+                    <tr>
+                      <th (click)="toggleSortMes('iccid'); $event.stopPropagation()">ICCID <span class="sort-icon">{{ sortIcon('iccid', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('marca'); $event.stopPropagation()">Marca <span class="sort-icon">{{ sortIcon('marca', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('dn'); $event.stopPropagation()">Número <span class="sort-icon">{{ sortIcon('dn', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('cliente'); $event.stopPropagation()">Cliente <span class="sort-icon">{{ sortIcon('cliente', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('fecha'); $event.stopPropagation()">Fecha <span class="sort-icon">{{ sortIcon('fecha', sortMes()) }}</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (a of mesSelAct()?.items ?? []; track a.iccid) {
+                      <tr>
+                        <td class="iccid">{{ a.iccid }}</td>
+                        <td class="marca" [class.unefon]="a.marca==='UNEFON'" [class.telcel]="a.marca==='TELCEL'" [class.movistar]="a.marca==='MOVISTAR'">{{ a.marca }}</td>
+                        <td>{{ a.dn || '—' }}</td>
+                        <td>{{ a.cliente }}</td>
+                        <td class="fecha">{{ a.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else if (mesDetalle() === m.mes) {
+              <div class="mes-detalle vacio">Sin activaciones en este mes.</div>
+            }
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (tab() === 'entregas') {
+    <section class="tarjetas">
+      @for (t of tarjetasEnt(); track t.label) {
+        <article class="tarjeta" [style.border-left-color]="t.color">
+          <span class="lbl">{{ t.label }}</span>
+          <span class="val">{{ t.value }}</span>
+        </article>
+      }
+    </section>
+
+    <section class="grafica">
+      <h2>Últimos 3 meses</h2>
+      <div class="meses-resumen">
+        @for (m of ultimos3MesesEnt(); track m.mes) {
+          <button class="mes-card" [class.expandido]="mesDetalle() === m.mes" (click)="verDetalleMes(m.mes)">
+            <div class="mes-header">
+              <span class="mes-nombre">{{ formatoMes(m.mes) }}</span>
+              <span class="mes-total">{{ m.total }}</span>
+            </div>
+            <div class="marcas-resumen">
+              @for (marca of ['ATT','UNEFON','TELCEL','MOVISTAR']; track marca) {
+                <span class="marca-chip" [class.unefon]="marca==='UNEFON'" [class.telcel]="marca==='TELCEL'" [class.movistar]="marca==='MOVISTAR'">
+                  {{ marca }}: {{ m.marcas.get(marca) ?? 0 }}
+                </span>
+              }
+            </div>
+            @if (mesDetalle() === m.mes && m.total > 0) {
+              <div class="mes-detalle">
+                <table>
+                  <thead>
+                    <tr>
+                      <th (click)="toggleSortMes('iccid'); $event.stopPropagation()">ICCID <span class="sort-icon">{{ sortIcon('iccid', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('marca'); $event.stopPropagation()">Marca <span class="sort-icon">{{ sortIcon('marca', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('cliente'); $event.stopPropagation()">Cliente <span class="sort-icon">{{ sortIcon('cliente', sortMes()) }}</span></th>
+                      <th (click)="toggleSortMes('fecha'); $event.stopPropagation()">Fecha <span class="sort-icon">{{ sortIcon('fecha', sortMes()) }}</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (e of mesSelEnt()?.items ?? []; track e.iccid) {
+                      <tr>
+                        <td class="iccid">{{ e.iccid }}</td>
+                        <td class="marca" [class.unefon]="e.marca==='UNEFON'" [class.telcel]="e.marca==='TELCEL'" [class.movistar]="e.marca==='MOVISTAR'">{{ e.marca }}</td>
+                        <td>{{ e.cliente }}</td>
+                        <td class="fecha">{{ e.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else if (mesDetalle() === m.mes) {
+              <div class="mes-detalle vacio">Sin entregas en este mes.</div>
+            }
+          </button>
+        }
+      </div>
+    </section>
+  }
+</main>

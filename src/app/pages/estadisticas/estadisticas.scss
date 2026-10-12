@@ -1,0 +1,88 @@
+:host { display: block; min-height: 100dvh; background: #f4f6f8; }
+
+.topbar {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1.25rem; background: #2c5364; color: #fff;
+  .back { color: #fff; text-decoration: none; font-size: 1.3rem; }
+  h1 { margin: 0; font-size: 1.1rem; }
+}
+
+.tabs {
+  display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; background: #fff; border-bottom: 1px solid #eef1f4; position: sticky; top: 0; z-index: 10;
+  button {
+    flex: 1; padding: 0.6rem 1rem; border: none; background: transparent; color: #546e7a; font-weight: 600; font-size: 0.9rem;
+    border-radius: 8px; cursor: pointer; transition: background 0.2s, color 0.2s;
+    &:hover { background: #eef1f4; color: #2c5364; }
+    &.active { background: #e3f2fd; color: #1565c0; }
+  }
+}
+
+.content { padding: 1rem 1.25rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+.tarjetas {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;
+  .tarjeta {
+    background: #fff; border-radius: 12px; padding: 1rem; border-left: 4px solid;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; gap: 0.25rem;
+    .lbl { font-size: 0.75rem; color: #6b7a85; text-transform: uppercase; letter-spacing: 0.5px; }
+    .val { font-size: 1.5rem; font-weight: 700; color: #15303f; }
+  }
+}
+
+.grafica {
+  background: #fff; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  h2 { margin: 0 0 1rem; font-size: 1rem; font-weight: 700; color: #15303f; }
+  .vacio { text-align: center; color: #90a4ae; padding: 2rem; font-size: 0.9rem; }
+}
+
+.meses-resumen { display: flex; flex-direction: column; gap: 0.75rem; }
+.mes-card {
+  background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border: 1px solid #eef1f4; cursor: pointer; transition: border 0.2s, box-shadow 0.2s;
+  &:hover { border-color: #bbdefb; box-shadow: 0 2px 8px rgba(25,118,210,0.1); }
+  &.expandido { border-color: #1565c0; box-shadow: 0 2px 8px rgba(25,118,210,0.15); }
+}
+.mes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.mes-nombre { font-weight: 700; color: #15303f; font-size: 1rem; }
+.mes-total {
+  background: #e3f2fd; color: #1565c0; font-weight: 700; font-size: 1.25rem;
+  padding: 0.25rem 0.75rem; border-radius: 999px; min-width: 50px; text-align: center;
+}
+.marcas-resumen { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.marca-chip {
+  padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600;
+  background: #eef1f4; color: #37474f;
+  &.unefon { background: #fff3e0; color: #e65100; }
+  &.telcel { background: #e8eaf6; color: #1a237e; }
+  &.movistar { background: #e0f2f1; color: #00796b; }
+}
+.mes-detalle { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eef1f4; animation: slideDown 0.2s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.mes-detalle.vacio { color: #90a4ae; font-size: 0.85rem; text-align: center; padding: 1rem; }
+
+.tabla-activaciones, .tabla-entregas { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid #eef1f4; }
+th {
+  font-weight: 700; color: #455a64; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; background: #fafbfc;
+  cursor: pointer; user-select: none; white-space: nowrap;
+  &:hover { background: #f0f4f8; }
+}
+th .sort-icon { margin-left: 0.35rem; font-size: 0.65rem; opacity: 0.6; }
+td.iccid { font-family: ui-monospace, monospace; font-size: 0.7rem; color: #90a4ae; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td.marca { font-weight: 600; font-size: 0.75rem; }
+td.marca.unefon { color: #e65100; }
+td.marca.telcel { color: #1a237e; }
+td.marca.movistar { color: #00796b; }
+td.fecha { color: #6b7a85; font-size: 0.75rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: none; }
+
+@media (max-width: 700px) {
+  .meses-resumen { gap: 0.5rem; }
+  .mes-card { padding: 0.75rem; }
+  .mes-total { font-size: 1rem; padding: 0.2rem 0.5rem; }
+  .tabla-activaciones th:nth-child(3), .tabla-activaciones td:nth-child(3),
+  .tabla-entregas th:nth-child(3), .tabla-entregas td:nth-child(3) { display: none; }
+}

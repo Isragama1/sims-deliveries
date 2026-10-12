@@ -1,0 +1,203 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f4f6f8;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: #2c5364;
+  color: #fff;
+
+  .back {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 0.5rem;
+
+  .tarjeta {
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+    &.selected {
+      border-color: #2c5364;
+    }
+
+    .num {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #15303f;
+    }
+
+    .lbl {
+      font-size: 0.75rem;
+      color: #6b7a85;
+    }
+
+    &.stock .num { color: #1565c0; }
+    &.activa .num { color: #2e7d32; }
+  }
+}
+
+.marcas {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 1.25rem;
+  flex-wrap: wrap;
+
+  .chip {
+    border: 1px solid #cfd8dc;
+    background: #fff;
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.78rem;
+    color: #37474f;
+    cursor: pointer;
+
+    strong { color: #15303f; }
+
+    &.selected {
+      background: #2c5364;
+      border-color: #2c5364;
+      color: #fff;
+
+      strong { color: #fff; }
+    }
+  }
+}
+
+.filtros {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem;
+
+  input {
+    flex: 1;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    outline: none;
+
+    &:focus { border-color: #2c5364; }
+  }
+
+  select {
+    padding: 0.6rem;
+    border: 1px solid #cfd8dc;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 0.9rem;
+  }
+}
+
+.lista {
+  padding: 0.5rem 1.25rem 2rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.sim {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #1565c0;
+
+  &.activada { border-left-color: #2e7d32; }
+
+  .fila1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dn {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #15303f;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: #e3f2fd;
+    color: #1565c0;
+
+    &.b-act {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+  }
+
+  .iccid {
+    font-family: ui-monospace, monospace;
+    font-size: 0.78rem;
+    color: #90a4ae;
+    margin: 0.2rem 0 0.4rem;
+  }
+
+  .fila2 {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+
+    .marca {
+      font-weight: 700;
+      color: #00a8e0;
+
+      &.unefon { color: #e65100; }
+      &.telcel { color: #1a237e; }
+      &.movistar { color: #00796b; }
+    }
+
+    .cliente { color: #37474f; }
+    .vence { color: #6b7a85; margin-left: auto; }
+  }
+
+  .btn-editar {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: #e3f2fd;
+    color: #1565c0;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    &:hover { background: #1565c0; color: #fff; }
+  }
+}
+
+.vacio {
+  text-align: center;
+  color: #6b7a85;
+  padding: 2rem 0;
+}

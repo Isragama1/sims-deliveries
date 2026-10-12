@@ -1,0 +1,42 @@
+<header class="topbar">
+  <a [routerLink]="esEdicion ? ['/clientes', id()] : ['/clientes']" class="back">←</a>
+  <h1>{{ esEdicion ? 'Editar cliente' : 'Nuevo cliente' }}</h1>
+</header>
+
+<section class="card">
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <label>
+      Nombre *
+      <input type="text" formControlName="nombre" placeholder="NOMBRE DEL CLIENTE" />
+      @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+        <span class="field-error">El nombre es obligatorio (mínimo 3 caracteres).</span>
+      }
+    </label>
+
+    <label>
+      Colonia
+      <input type="text" formControlName="colonia" placeholder="OBLATOS, TONALA…" />
+    </label>
+
+    <label>
+      Domicilio
+      <input type="text" formControlName="domicilio" placeholder="Calle, número, colonia, ciudad" />
+    </label>
+
+    <label>
+      Teléfono (10 dígitos)
+      <input type="tel" formControlName="telefono" placeholder="3312345678" maxlength="10" />
+      @if (form.controls.telefono.touched && form.controls.telefono.invalid) {
+        <span class="field-error">Deben ser exactamente 10 dígitos.</span>
+      }
+    </label>
+
+    @if (error()) {
+      <p class="msg-error">{{ error() }}</p>
+    }
+
+    <button type="submit" [disabled]="guardando()">
+      {{ guardando() ? 'Guardando…' : esEdicion ? 'Guardar cambios' : 'Dar de alta' }}
+    </button>
+  </form>
+</section>

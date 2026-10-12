@@ -1,0 +1,60 @@
+<header class="topbar">
+  <a routerLink="/clientes" class="back">←</a>
+  <h1>{{ cliente()?.nombre ?? 'Cliente' }}</h1>
+  <a [routerLink]="['/clientes', id(), 'editar']" class="editar">✏️ Editar</a>
+</header>
+
+@if (cliente(); as c) {
+  <section class="ficha">
+    <div class="dato"><span class="lbl">ID</span><span>#{{ c.id }}</span></div>
+    @if (c.colonia) {
+      <div class="dato"><span class="lbl">Colonia</span><span>{{ c.colonia }}</span></div>
+    }
+    @if (c.domicilio) {
+      <div class="dato"><span class="lbl">Domicilio</span><span>{{ c.domicilio }}</span></div>
+    }
+    @if (c.telefono) {
+      <div class="dato">
+        <span class="lbl">Teléfono</span>
+        <a class="tel" href="tel:{{ c.telefono }}">{{ c.telefono }}</a>
+      </div>
+    }
+  </section>
+}
+
+<section class="seccion">
+  <h2>SIMs asignadas ({{ sims().length }})</h2>
+  @for (a of sims(); track a.iccid) {
+    <article class="sim" [class.activada]="a.estatus === 'activado'">
+      <div class="fila1">
+        <span class="dn">{{ a.lada }} {{ a.dn }}</span>
+        <span class="badge" [class.b-act]="a.estatus === 'activado'">
+          {{ a.estatus === 'activado' ? 'Activada' : 'En stock' }}
+        </span>
+      </div>
+      <div class="iccid">{{ a.iccid }}</div>
+      <div class="fila2">
+        <span class="marca" [class.unefon]="a.marca === 'UNEFON'">{{ a.marca }}</span>
+        @if (a.fechaVencimiento) {
+          <span class="vence">Vence: {{ a.fechaVencimiento.toDate() | date: 'dd/MM/yyyy' }}</span>
+        }
+      </div>
+    </article>
+  } @empty {
+    <p class="vacio">Sin SIMs asignadas.</p>
+  }
+</section>
+
+<section class="seccion">
+  <h2>Entregas ({{ entregas().length }})</h2>
+  @for (e of entregas(); track e.iccid) {
+    <article class="entrega">
+      <span class="iccid">{{ e.iccid }}</span>
+      @if (e.fechaEntrega) {
+        <span class="fecha">{{ e.fechaEntrega.toDate() | date: 'dd/MM/yyyy' }}</span>
+      }
+    </article>
+  } @empty {
+    <p class="vacio">Sin entregas registradas.</p>
+  }
+</section>

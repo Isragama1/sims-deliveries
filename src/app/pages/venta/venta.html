@@ -1,0 +1,113 @@
+<header class="topbar">
+  <a routerLink="/home" class="back">←</a>
+  <h1>Registro de entregas</h1>
+</header>
+
+<section class="card form">
+  <h2>Nueva entrega</h2>
+
+  <label>
+    SIMs (busca por ICCID o número y agrega varias)
+    <div class="sim-box">
+      <input
+        type="search"
+        placeholder="Mínimo 3 caracteres…"
+        [ngModel]="busquedaSim()"
+        (ngModelChange)="busquedaSim.set($event)"
+      />
+      @if (simsSeleccionadas().length) {
+        <button type="button" class="limpiar" (click)="limpiarSims()">✕ Todas</button>
+      }
+    </div>
+    @if (sugerencias().length) {
+      <ul class="sugerencias">
+        @for (a of sugerencias(); track a.iccid) {
+          <li (click)="elegirSim(a)">
+            <span class="dn">{{ a.lada }} {{ a.dn }}</span>
+            <span class="marca" [class.unefon]="a.marca === 'UNEFON'" [class.telcel]="a.marca === 'TELCEL'" [class.movistar]="a.marca === 'MOVISTAR'">{{ a.marca }}</span>
+            <span class="icc">{{ a.iccid }}</span>
+            <span class="badge" [class.b-act]="a.estatus === 'activado'">
+              {{ a.estatus === 'activado' ? 'Activada' : 'Stock' }}
+            </span>
+          </li>
+        }
+      </ul>
+    }
+    @if (simsSeleccionadas().length) {
+      <ul class="seleccionadas">
+        @for (s of simsSeleccionadas(); track s.iccid) {
+          <li>
+            <span class="dn">{{ s.dn ?? 's/n' }}</span>
+            <span class="marca" [class.unefon]="s.marca === 'UNEFON'" [class.telcel]="s.marca === 'TELCEL'" [class.movistar]="s.marca === 'MOVISTAR'">{{ s.marca }}</span>
+            <span class="icc">{{ s.iccid }}</span>
+            <button type="button" class="quitar" (click)="quitarSim(s.iccid)">✕</button>
+          </li>
+        }
+      </ul>
+      <span class="contador-sims">{{ simsSeleccionadas().length }} SIM(s) en esta venta</span>
+    }
+  </label>
+
+  <label>
+    Cliente
+    <select [ngModel]="clienteId()" (ngModelChange)="clienteId.set($event)">
+      <option value="" disabled>Selecciona cliente…</option>
+      @for (c of clientes(); track c.id) {
+        <option [value]="c.id">{{ c.nombre }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    Notas (opcional)
+    <input type="text" [ngModel]="notas()" (ngModelChange)="notas.set($event)" />
+  </label>
+
+  @if (mensaje(); as m) {
+    <p class="msg" [class.ok]="m.tipo === 'ok'" [class.error]="m.tipo === 'error'">
+      {{ m.texto }}
+    </p>
+  }
+
+  <button class="guardar" [disabled]="!valido() || guardando()" (click)="guardar()">
+    {{ guardando() ? 'Guardando…' : 'Registrar entrega' }}
+  </button>
+</section>
+
+<section class="historial">
+  <h2>Historial ({{ ventas().length }})</h2>
+  @for (v of ventas(); track v.id) {
+    <article class="venta">
+      <div class="fila1">
+        <span class="concepto" [class.act]="v.concepto === 'activacion'">
+          {{ v.concepto === 'activacion' ? 'Activación' : v.concepto === 'recarga' ? 'Recarga' : 'Entrega' }}
+        </span>
+        @if (v.monto != null) {
+          <span class="monto">\${{ v.monto | number: '1.0-2' }}</span>
+        }
+      </div>
+      <div class="icc-lista">
+        @for (icc of iccidsDe(v); track icc) {
+          <div class="icc">{{ icc }}</div>
+        }
+      </div>
+      <div class="fila2">
+        <span class="num-sims">{{ iccidsDe(v).length }} SIM(s)</span>
+        @if (v.clienteNombre) {
+          <span class="cliente">{{ v.clienteNombre }}</span>
+        }
+        @if (v.ubicacion) {
+          <a class="ubicacion" [href]="mapsUrl(v.ubicacion)" target="_blank" rel="noopener">📍 Mapa</a>
+        }
+        @if (v.fecha) {
+          <span class="fecha">{{ v.fecha.toDate() | date: 'dd/MM/yyyy HH:mm' }}</span>
+        }
+      </div>
+      @if (v.notas) {
+        <div class="notas">{{ v.notas }}</div>
+      }
+    </article>
+  } @empty {
+    <p class="vacio">Aún no hay ventas registradas.</p>
+  }
+</section>

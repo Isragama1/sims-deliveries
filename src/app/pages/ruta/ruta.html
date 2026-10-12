@@ -1,0 +1,36 @@
+<header class="topbar">
+  <a routerLink="/home" class="back">←</a>
+  <h1>Ruta del día</h1>
+  <span class="contador">{{ visitadosHoy() }} visitados hoy</span>
+</header>
+
+@for (g of grupos(); track g.colonia) {
+  <section class="grupo">
+    <h2>{{ g.colonia }} <span class="n">({{ g.clientes.length }})</span></h2>
+    @for (c of g.clientes; track c.id) {
+      <article class="cliente" [class.visitado]="esHoy(c)">
+        <div class="info">
+          <a [routerLink]="['/clientes', c.id]" class="nombre">{{ c.nombre }}</a>
+          @if (c.domicilio) {
+            <a class="domicilio" [href]="mapsUrl(c)" target="_blank" rel="noopener">
+              📍 {{ c.domicilio }}
+            </a>
+          }
+          <div class="acciones-sec">
+            @if (c.telefono) {
+              <a class="tel" href="tel:{{ c.telefono }}">📞 {{ c.telefono }}</a>
+            }
+            @if (c.ultimaVisita) {
+              <span class="ultima">Última visita: {{ c.ultimaVisita.toDate() | date: 'dd/MM/yyyy HH:mm' }}</span>
+            }
+          </div>
+        </div>
+        <button class="visita" [class.hecha]="esHoy(c)" (click)="marcarVisita(c)">
+          {{ esHoy(c) ? '✓ Visitado' : 'Marcar visita' }}
+        </button>
+      </article>
+    }
+  </section>
+} @empty {
+  <p class="vacio">No hay clientes en ruta.</p>
+}

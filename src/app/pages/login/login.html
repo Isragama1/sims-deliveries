@@ -1,0 +1,42 @@
+<main class="login-wrap">
+  <section class="card">
+    <h1>Ruta Colocación</h1>
+    <p class="subtitle">Inicia sesión para continuar</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        Correo
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+          autocomplete="email"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Ingresa un correo válido.</span>
+        }
+      </label>
+
+      <label>
+        Contraseña
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error">Mínimo 6 caracteres.</span>
+        }
+      </label>
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      <button type="submit" [disabled]="loading()">
+        {{ loading() ? 'Entrando…' : 'Iniciar sesión' }}
+      </button>
+    </form>
+  </section>
+</main>

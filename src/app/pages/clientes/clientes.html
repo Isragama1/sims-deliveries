@@ -1,0 +1,39 @@
+<header class="topbar">
+  <a routerLink="/home" class="back">←</a>
+  <h1>Clientes</h1>
+  <a routerLink="/clientes/nuevo" class="nuevo">+ Nuevo</a>
+</header>
+
+<section class="filtros">
+  <input
+    type="search"
+    placeholder="Buscar por nombre, colonia, teléfono…"
+    [ngModel]="busqueda()"
+    (ngModelChange)="busqueda.set($event)"
+  />
+</section>
+
+<section class="lista">
+  @for (c of filtrados(); track c.id) {
+    <a class="cliente" [routerLink]="['/clientes', c.id]">
+      <div class="fila1">
+        <span class="nombre">{{ c.nombre }}</span>
+        <span class="id">#{{ c.id }}</span>
+      </div>
+      @if (c.domicilio) {
+        <div class="domicilio">{{ c.domicilio }}</div>
+      }
+      <div class="fila2">
+        @if (c.colonia) {
+          <span class="colonia">{{ c.colonia }}</span>
+        }
+        @if (c.telefono) {
+          <span class="tel">📞 {{ c.telefono }}</span>
+        }
+        <span class="sims">{{ c.sims }} SIMs ({{ c.activadas }} activadas)</span>
+      </div>
+    </a>
+  } @empty {
+    <p class="vacio">No hay clientes que coincidan.</p>
+  }
+</section>
