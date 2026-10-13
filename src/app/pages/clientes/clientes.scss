@@ -66,6 +66,11 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   text-decoration: none;
 
+  &.stock-bajo-card {
+    background: #fff8f7;
+    box-shadow: inset 0 0 0 2px #c62828, 0 2px 8px rgba(198, 40, 40, 0.18);
+  }
+
   .fila1 {
     display: flex;
     justify-content: space-between;
@@ -110,6 +115,58 @@
       color: #2e7d32;
       font-weight: 600;
     }
+  }
+
+  .stock-resumen {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+  }
+
+  .stock-label {
+    color: #546e7a;
+    font-weight: 600;
+  }
+
+  .stock-chip {
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: #eef1f4;
+    color: #37474f;
+    font-weight: 700;
+
+    &.att {
+      background: #e1f5fe;
+      color: #0084b4;
+    }
+
+    &.unefon {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    &.telcel {
+      background: #e8eaf6;
+      color: #1a237e;
+    }
+
+    &.movistar {
+      background: #e0f2f1;
+      color: #00796b;
+    }
+
+    &.stock-bajo {
+      box-shadow: inset 0 0 0 1px #c62828;
+    }
+  }
+
+  .stock-alerta {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: #b71c1c;
   }
 }
 

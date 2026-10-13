@@ -58,6 +58,15 @@
     </select>
   </label>
 
+  <label for="fecha-entrega">Fecha de entrega</label>
+  <input
+    id="fecha-entrega"
+    type="date"
+    required
+    [ngModel]="fechaEntrega()"
+    (ngModelChange)="fechaEntrega.set($event)"
+  />
+
   <label>
     Notas (opcional)
     <input type="text" [ngModel]="notas()" (ngModelChange)="notas.set($event)" />
@@ -76,6 +85,11 @@
 
 <section class="historial">
   <h2>Historial ({{ ventas().length }})</h2>
+  @if (mensajeHistorial(); as mensaje) {
+    <p class="msg" [class.ok]="mensaje.tipo === 'ok'" [class.error]="mensaje.tipo === 'error'" role="status">
+      {{ mensaje.texto }}
+    </p>
+  }
   @for (v of ventas(); track v.id) {
     <article class="venta">
       <div class="fila1">
@@ -84,6 +98,17 @@
         </span>
         @if (v.monto != null) {
           <span class="monto">\${{ v.monto | number: '1.0-2' }}</span>
+        }
+        @if (v.concepto === 'entrega' && v.id) {
+          <button
+            type="button"
+            class="eliminar"
+            [disabled]="eliminandoVenta() !== null"
+            [attr.aria-label]="'Eliminar entrega de ' + (v.clienteNombre ?? 'cliente')"
+            (click)="eliminarEntrega(v)"
+          >
+            {{ eliminandoVenta() === v.id ? 'Eliminando…' : 'Eliminar' }}
+          </button>
         }
       </div>
       <div class="icc-lista">

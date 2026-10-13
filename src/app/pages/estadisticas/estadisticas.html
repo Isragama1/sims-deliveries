@@ -10,21 +10,21 @@
   </nav>
 
   @if (tab() === 'activaciones') {
-    <ng-container *ngTemplateOutlet="mesesTemplate; context: { meses: mesesAct(), mesSel: mesSelAct(), toggleSort: toggleSortMes, sort: sortMes, sortIcon: sortIcon, formatoMes: formatoMes, marcaCount: marcaCount, verDetalleMes: verDetalleMes, mesDetalle: mesDetalle, tieneDN: true }"></ng-container>
+    <ng-container *ngTemplateOutlet="mesesTemplate; context: { meses: mesesAct(), mesSel: mesSelAct(), items: itemsFiltradosAct(), filtros: filtrosAct(), setFiltro: setFiltroAct, toggleSort: toggleSortMes, sort: sortMes, sortIcon: sortIcon, formatoMes: formatoMes, marcaCount: marcaCount, verDetalleMes: verDetalleMes, mesDetalle: mesDetalle, tieneDN: true }"></ng-container>
   }
 
   @if (tab() === 'entregas') {
-    <ng-container *ngTemplateOutlet="mesesTemplate; context: { meses: mesesEnt(), mesSel: mesSelEnt(), toggleSort: toggleSortMes, sort: sortMes, sortIcon: sortIcon, formatoMes: formatoMes, marcaCount: marcaCount, verDetalleMes: verDetalleMes, mesDetalle: mesDetalle, tieneDN: false }"></ng-container>
+    <ng-container *ngTemplateOutlet="mesesTemplate; context: { meses: mesesEnt(), mesSel: mesSelEnt(), items: itemsFiltradosEnt(), filtros: filtrosEnt(), setFiltro: setFiltroEnt, toggleSort: toggleSortMes, sort: sortMes, sortIcon: sortIcon, formatoMes: formatoMes, marcaCount: marcaCount, verDetalleMes: verDetalleMes, mesDetalle: mesDetalle, tieneDN: false }"></ng-container>
   }
 
-  <ng-template #mesesTemplate let-meses let-mesSel="mesSel" let-toggleSort="toggleSort" let-sort="sort" let-sortIcon="sortIcon" let-formatoMes="formatoMes" let-marcaCount="marcaCount" let-verDetalleMes="verDetalleMes" let-mesDetalle="mesDetalle" let-tieneDN="tieneDN">
+  <ng-template #mesesTemplate let-meses="meses" let-mesSel="mesSel" let-items="items" let-filtros="filtros" let-setFiltro="setFiltro" let-toggleSort="toggleSort" let-sort="sort" let-sortIcon="sortIcon" let-formatoMes="formatoMes" let-marcaCount="marcaCount" let-verDetalleMes="verDetalleMes" let-mesDetalle="mesDetalle" let-tieneDN="tieneDN">
     <section class="meses-filtro">
       <div class="select-wrapper">
         <label for="mes-select" class="select-label">Filtrar por mes</label>
         <div class="select-custom">
           <select id="mes-select" [value]="mesDetalle() || ''" (change)="verDetalleMes($any($event.target).value)" class="select-native">
             <option value="">Todos los meses</option>
-            @for (m of meses; track m.mes) {
+            @for (m of meses ?? []; track m.mes) {
               <option [value]="m.mes">{{ formatoMes(m.mes) }} ({{ m.total }})</option>
             }
           </select>
@@ -34,7 +34,7 @@
     </section>
 
     <section class="grafica">
-      <h2>{{ mesDetalle() ? ('Detalle: ' + formatoMes(mesDetalle()!)) : 'Todos los meses' }} ({{ mesSel?.total ?? meses.reduce((s,m)=>s+m.total,0) }})</h2>
+      <h2>{{ mesDetalle() ? ('Detalle: ' + formatoMes(mesDetalle()!)) : 'Todos los meses' }} ({{ mesSel?.total ?? (meses ?? []).reduce((s,m)=>s+m.total,0) }})</h2>
 
       @if (mesDetalle()) {
         <div class="mes-detalle">
@@ -48,17 +48,32 @@
           <table>
             <thead>
               <tr>
-                <th (click)="toggleSort('iccid'); $event.stopPropagation()">ICCID <span class="sort-icon">{{ sortIcon('iccid', sort()) }}</span></th>
-                <th (click)="toggleSort('marca'); $event.stopPropagation()">Marca <span class="sort-icon">{{ sortIcon('marca', sort()) }}</span></th>
+                <th (click)="toggleSort('iccid'); $event.stopPropagation()">
+                  <span>ICCID <span class="sort-icon">{{ sortIcon('iccid', sort()) }}</span></span>
+                  <input class="header-filter" type="search" aria-label="Buscar por ICCID" placeholder="Buscar..." [value]="filtros.iccid" (input)="setFiltro('iccid', $any($event.target).value)" (click)="$event.stopPropagation()">
+                </th>
+                <th (click)="toggleSort('marca'); $event.stopPropagation()">
+                  <span>Marca <span class="sort-icon">{{ sortIcon('marca', sort()) }}</span></span>
+                  <input class="header-filter" type="search" aria-label="Buscar por marca" placeholder="Buscar..." [value]="filtros.marca" (input)="setFiltro('marca', $any($event.target).value)" (click)="$event.stopPropagation()">
+                </th>
                 @if (tieneDN) {
-                  <th (click)="toggleSort('dn'); $event.stopPropagation()">Número <span class="sort-icon">{{ sortIcon('dn', sort()) }}</span></th>
+                  <th (click)="toggleSort('dn'); $event.stopPropagation()">
+                    <span>Número <span class="sort-icon">{{ sortIcon('dn', sort()) }}</span></span>
+                    <input class="header-filter" type="search" aria-label="Buscar por número" placeholder="Buscar..." [value]="filtros.dn" (input)="setFiltro('dn', $any($event.target).value)" (click)="$event.stopPropagation()">
+                  </th>
                 }
-                <th (click)="toggleSort('cliente'); $event.stopPropagation()">Cliente <span class="sort-icon">{{ sortIcon('cliente', sort()) }}</span></th>
-                <th (click)="toggleSort('fecha'); $event.stopPropagation()">Fecha <span class="sort-icon">{{ sortIcon('fecha', sort()) }}</span></th>
+                <th (click)="toggleSort('cliente'); $event.stopPropagation()">
+                  <span>Cliente <span class="sort-icon">{{ sortIcon('cliente', sort()) }}</span></span>
+                  <input class="header-filter" type="search" aria-label="Buscar por cliente" placeholder="Buscar..." [value]="filtros.cliente" (input)="setFiltro('cliente', $any($event.target).value)" (click)="$event.stopPropagation()">
+                </th>
+                <th (click)="toggleSort('fecha'); $event.stopPropagation()">
+                  <span>Fecha <span class="sort-icon">{{ sortIcon('fecha', sort()) }}</span></span>
+                  <input class="header-filter" type="search" aria-label="Buscar por fecha" placeholder="Buscar..." [value]="filtros.fecha" (input)="setFiltro('fecha', $any($event.target).value)" (click)="$event.stopPropagation()">
+                </th>
               </tr>
             </thead>
             <tbody>
-              @for (a of mesSel?.items ?? []; track a.iccid) {
+              @for (a of items; track a.iccid) {
                 <tr>
                   <td class="iccid">{{ a.iccid }}</td>
                   <td class="marca" [class.unefon]="a.marca==='UNEFON'" [class.telcel]="a.marca==='TELCEL'" [class.movistar]="a.marca==='MOVISTAR'">{{ a.marca }}</td>
@@ -69,14 +84,18 @@
                   <td class="fecha">{{ a.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
                 </tr>
               } @empty {
-                <tr><td [attr.colspan]="tieneDN ? 5 : 4" class="vacio">Sin {{ tieneDN ? 'activaciones' : 'entregas' }} en este mes.</td></tr>
+                <tr>
+                  <td [attr.colspan]="tieneDN ? 5 : 4" class="vacio">
+                    {{ (mesSel?.items?.length ?? 0) > 0 ? 'Sin resultados para estos filtros.' : 'Sin ' + (tieneDN ? 'activaciones' : 'entregas') + ' en este mes.' }}
+                  </td>
+                </tr>
               }
             </tbody>
           </table>
         </div>
       } @else {
         <div class="meses-resumen">
-          @for (m of meses; track m.mes) {
+          @for (m of meses ?? []; track m.mes) {
             <article class="mes-card" [class.expandido]="mesDetalle() === m.mes" (click)="verDetalleMes(m.mes)">
               <div class="mes-header">
                 <span class="mes-nombre">{{ formatoMes(m.mes) }}</span>

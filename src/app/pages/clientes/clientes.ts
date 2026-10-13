@@ -7,7 +7,15 @@ import { Cliente, Activacion } from '../../core/models';
 
 interface ClienteConStats extends Cliente {
   sims: number;
-  activadas: number;
+  stockPorMarca: { marca: string; cantidad: number }[];
+  stockBajo: boolean;
+}
+
+const MARCAS = ['ATT', 'UNEFON', 'TELCEL', 'MOVISTAR'] as const;
+type Marca = (typeof MARCAS)[number];
+
+function esMarca(marca: string): marca is Marca {
+  return MARCAS.some((item) => item === marca);
 }
 
 @Component({
@@ -28,19 +36,37 @@ export class Clientes {
   readonly clientes = computed<ClienteConStats[]>(() => {
     const clientes = this.clientesBase();
     const acts = this.activaciones();
-    const mapa = new Map<string, { sims: number; activadas: number }>();
+    const mapa = new Map<
+      string,
+      { sims: number; stockPorMarca: Record<Marca, number> }
+    >();
     for (const a of acts) {
       if (!a.clienteId) continue;
-      const m = mapa.get(a.clienteId) ?? { sims: 0, activadas: 0 };
-      m.sims++;
-      if (a.estatus === 'activado') m.activadas++;
+      const m = mapa.get(a.clienteId) ?? {
+        sims: 0,
+        stockPorMarca: { ATT: 0, UNEFON: 0, TELCEL: 0, MOVISTAR: 0 },
+      };
+      if (a.estatus === 'en_stock') {
+        m.sims++;
+        const marca = a.marca?.trim().toLocaleUpperCase();
+        if (marca && esMarca(marca)) {
+          m.stockPorMarca[marca]++;
+        }
+      }
       mapa.set(a.clienteId, m);
     }
-    return clientes.map(c => ({
-      ...c,
-      sims: mapa.get(c.id)?.sims ?? 0,
-      activadas: mapa.get(c.id)?.activadas ?? 0,
-    }));
+    return clientes.map((c) => {
+      const stockPorMarca = MARCAS.map((marca) => ({
+        marca,
+        cantidad: mapa.get(c.id)?.stockPorMarca[marca] ?? 0,
+      }));
+      return {
+        ...c,
+        sims: mapa.get(c.id)?.sims ?? 0,
+        stockPorMarca,
+        stockBajo: stockPorMarca.some(({ cantidad }) => cantidad <= 2),
+      };
+    });
   });
 
   readonly filtrados = computed(() => {

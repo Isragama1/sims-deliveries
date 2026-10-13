@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import {
   Firestore,
+  Timestamp,
   addDoc,
   collection,
   collectionData,
@@ -15,13 +16,21 @@ import {
   writeBatch,
   orderBy,
 } from '@angular/fire/firestore';
-import { Observable, combineLatest, map, take } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Observable, combineLatest, map, shareReplay, take } from 'rxjs';
 import { Activacion, Cliente, Entrega, Venta } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private db = inject(Firestore);
+  private readonly activacionesStream = (
+    collectionData(collection(this.db, 'activaciones'), { idField: 'iccid' }) as Observable<Activacion[]>
+  ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  private readonly clientesStream = (
+    collectionData(query(collection(this.db, 'clientes'), orderBy('nombre'))) as Observable<Cliente[]>
+  ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  private readonly entregasStream = (
+    collectionData(collection(this.db, 'entregas'), { idField: 'iccid' }) as Observable<Entrega[]>
+  ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
 
   // ===== CACHED SIGNALS (load once, reuse everywhere) =====
   private _activaciones = signal<Activacion[]>([]);
@@ -56,8 +65,7 @@ export class DataService {
 
   private async loadActivaciones(): Promise<void> {
     await new Promise<void>((resolve) => {
-      collectionData(collection(this.db, 'activaciones'), { idField: 'iccid' })
-        .pipe(take(1))
+      this.activacionesStream.pipe(take(1))
         .subscribe({
           next: (data) => {
             this._activaciones.set(data as Activacion[]);
@@ -74,8 +82,7 @@ export class DataService {
 
   private async loadClientes(): Promise<void> {
     await new Promise<void>((resolve) => {
-      collectionData(query(collection(this.db, 'clientes'), orderBy('nombre')))
-        .pipe(take(1))
+      this.clientesStream.pipe(take(1))
         .subscribe({
           next: (data) => {
             this._clientes.set(data as Cliente[]);
@@ -92,8 +99,7 @@ export class DataService {
 
   private async loadEntregas(): Promise<void> {
     await new Promise<void>((resolve) => {
-      collectionData(collection(this.db, 'entregas'), { idField: 'iccid' })
-        .pipe(take(1))
+      this.entregasStream.pipe(take(1))
         .subscribe({
           next: (data) => {
             this._entregas.set(data as Entrega[]);
@@ -111,22 +117,22 @@ export class DataService {
   // ===== OBSERVABLES (for real-time if needed) =====
   /** Observable en tiempo real de activaciones. */
   activaciones$(): Observable<Activacion[]> {
-    return collectionData(collection(this.db, 'activaciones'), { idField: 'iccid' }) as Observable<Activacion[]>;
+    return this.activacionesStream;
   }
 
   /** Observable en tiempo real de clientes. */
   clientes$(): Observable<Cliente[]> {
-    return collectionData(query(collection(this.db, 'clientes'), orderBy('nombre'))) as Observable<Cliente[]>;
+    return this.clientesStream;
   }
 
   /** Observable en tiempo real de entregas. */
   entregas$(): Observable<Entrega[]> {
-    return collectionData(collection(this.db, 'entregas'), { idField: 'iccid' }) as Observable<Entrega[]>;
+    return this.entregasStream;
   }
 
   /** Observable en tiempo real de ventas. */
   ventas$(): Observable<Venta[]> {
-    return collectionData(collection(this.db, 'ventas')) as Observable<Venta[]>;
+    return collectionData(collection(this.db, 'ventas'), { idField: 'id' }) as Observable<Venta[]>;
   }
 
   // ===== CLIENTE SINGLE =====
@@ -155,9 +161,24 @@ export class DataService {
   /** Registra venta y actualiza SIMs. */
   async registrarVenta(
     venta: Omit<Venta, 'id' | 'fecha' | 'iccid'> & { iccids: string[] },
-    opciones: { marcarActivada: boolean },
+    opciones: { marcarActivada: boolean; fechaEntrega: Date },
   ): Promise<void> {
+    if (Number.isNaN(opciones.fechaEntrega.getTime())) {
+      throw new Error('La fecha de entrega no es válida.');
+    }
     await addDoc(collection(this.db, 'ventas'), { ...venta, fecha: serverTimestamp() });
+    if (venta.concepto === 'entrega') {
+      await Promise.all(
+        venta.iccids.map((iccid) =>
+          setDoc(doc(this.db, 'entregas', iccid), {
+            iccid,
+            clienteId: venta.clienteId,
+            clienteNombre: venta.clienteNombre,
+            fechaEntrega: Timestamp.fromDate(opciones.fechaEntrega),
+          }),
+        ),
+      );
+    }
     const cambios: Record<string, unknown> = {
       clienteId: venta.clienteId,
       clienteNombre: venta.clienteNombre,
@@ -169,6 +190,34 @@ export class DataService {
     await Promise.all(venta.iccids.map((iccid) => updateDoc(doc(this.db, 'activaciones', iccid), cambios)));
     // Invalidar cache local para próxima carga
     this._activacionesLoaded.set(false);
+  }
+
+  /** Elimina una entrega y devuelve sus SIMs al stock en una operación atómica. */
+  async eliminarEntrega(venta: Venta): Promise<void> {
+    if (venta.concepto !== 'entrega' || !venta.id) {
+      throw new Error('La entrega no tiene un identificador válido.');
+    }
+
+    const iccids = [...new Set(venta.iccids ?? (venta.iccid ? [venta.iccid] : []))];
+    if (iccids.length === 0) {
+      throw new Error('La entrega no contiene SIMs para devolver al stock.');
+    }
+    if (iccids.length * 2 + 1 > 500) {
+      throw new Error('La entrega excede el límite de SIMs que se pueden borrar de una vez.');
+    }
+
+    const batch = writeBatch(this.db);
+    batch.delete(doc(this.db, 'ventas', venta.id));
+    for (const iccid of iccids) {
+      batch.delete(doc(this.db, 'entregas', iccid));
+      batch.update(doc(this.db, 'activaciones', iccid), {
+        estatus: 'en_stock',
+        clienteId: null,
+        clienteNombre: null,
+        fechaActivacionBase: null,
+      });
+    }
+    await batch.commit();
   }
 
   /** Crea cliente con ID auto. */

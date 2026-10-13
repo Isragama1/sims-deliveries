@@ -69,6 +69,13 @@ th {
   &:hover { background: #f0f4f8; }
 }
 th .sort-icon { margin-left: 0.35rem; font-size: 0.65rem; opacity: 0.6; }
+.header-filter {
+  display: block; box-sizing: border-box; width: 100%; min-width: 95px; margin-top: 0.4rem;
+  padding: 0.35rem 0.45rem; border: 1px solid #cfd8dc; border-radius: 5px; background: #fff;
+  color: #263238; font: inherit; font-size: 0.7rem; font-weight: 400; letter-spacing: normal;
+  text-transform: none; cursor: text;
+  &:focus-visible { outline: 2px solid #1976d2; outline-offset: 1px; }
+}
 td.iccid { font-family: ui-monospace, monospace; font-size: 0.7rem; color: #90a4ae; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 td.marca { font-weight: 600; font-size: 0.75rem; }
 td.marca.unefon { color: #e65100; }

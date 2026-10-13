@@ -15,7 +15,7 @@
 
 <section class="lista">
   @for (c of filtrados(); track c.id) {
-    <a class="cliente" [routerLink]="['/clientes', c.id]">
+    <a class="cliente" [class.stock-bajo-card]="c.stockBajo" [routerLink]="['/clientes', c.id]">
       <div class="fila1">
         <span class="nombre">{{ c.nombre }}</span>
         <span class="id">#{{ c.id }}</span>
@@ -30,7 +30,25 @@
         @if (c.telefono) {
           <span class="tel">📞 {{ c.telefono }}</span>
         }
-        <span class="sims">{{ c.sims }} SIMs ({{ c.activadas }} activadas)</span>
+        <span class="sims">{{ c.sims }} SIMs en stock</span>
+      </div>
+      <div class="stock-resumen">
+        <span class="stock-label">Stock sin activar:</span>
+        @for (item of c.stockPorMarca; track item.marca) {
+          <span
+            class="stock-chip"
+            [class.att]="item.marca === 'ATT'"
+            [class.unefon]="item.marca === 'UNEFON'"
+            [class.telcel]="item.marca === 'TELCEL'"
+            [class.movistar]="item.marca === 'MOVISTAR'"
+            [class.stock-bajo]="item.cantidad <= 2"
+          >
+            {{ item.marca }}: {{ item.cantidad }}
+            @if (item.cantidad <= 2) {
+              <span class="stock-alerta">(bajo)</span>
+            }
+          </span>
+        }
       </div>
     </a>
   } @empty {

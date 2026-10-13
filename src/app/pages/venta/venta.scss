@@ -240,6 +240,7 @@ select {
 
   .fila1 {
     display: flex;
+    gap: 0.6rem;
     justify-content: space-between;
     align-items: center;
   }
@@ -255,6 +256,21 @@ select {
   .monto {
     font-weight: 700;
     color: #15303f;
+  }
+
+  .eliminar {
+    margin-left: auto;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid #ef9a9a;
+    border-radius: 7px;
+    background: #fff;
+    color: #b71c1c;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #ffebee; }
+    &:disabled { opacity: 0.55; cursor: wait; }
   }
 
   .icc-lista {
